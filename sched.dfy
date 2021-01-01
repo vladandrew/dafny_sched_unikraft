@@ -1,5 +1,6 @@
+//type{:nativeType "ulong"} uint64 = i:int | 0 <= i < 0x10000000000000000
+//type uint64 = x:int | 0 <= x < 0x10000000000000000
 newtype uint64 = i:int | 0 <= i < 0x10000000000000000
-newtype uint32 = i:int | 0 <= i < 0x100000000
 
 predicate unique(q : seq<Thread>)
 {
@@ -157,6 +158,7 @@ class Thread {
     var name        : string;
     var stack       : uint64;
     var ctx         : uint64;
+    var tls         : uint64;
     var runnable    : bool;
     var queueable   : bool;
     var exited      : bool;
@@ -619,6 +621,7 @@ class SleepingQueue {
     }
 
     constructor Init(queue : seq<Thread>)
+    requires |queue| < 0x10000000000000000
     requires forall i :: 0 <= i < |queue| ==> (elemValid(queue[i]) && queue[i] !in (queue[..i] + queue[i + 1..]))
     requires sorted(queue)
     ensures Valid()
@@ -974,9 +977,9 @@ class SchedCoop {
         var to_wake_up : seq<Thread> := sleeping_threads.partition(crt_clock);
         var i := 0;
 
-        while i < |to_wake_up| 
+        while i < |to_wake_up|  as uint64
             modifies thread_list, to_wake_up
-            invariant 0 <= i <= |to_wake_up|
+            invariant 0 <= i <= |to_wake_up| as uint64
             invariant sched_inv()
             invariant thread_list.q == old(thread_list.q) + to_wake_up[..i]
             invariant forall t : Thread | t in to_wake_up[..i] :: t.wakeup_time == 0
