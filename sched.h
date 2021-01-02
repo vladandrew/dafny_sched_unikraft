@@ -33,13 +33,15 @@ namespace _module  {
     DafnySequence<char> name = DafnySequence<char>();
     uint64 stack = 0;
     uint64 ctx = 0;
+    uint64 uk_thread = 0;
+    uint64 uk_sched = 0;
     bool runnable = false;
     bool queueable = false;
     bool exited = false;
     uint16 flags = 0;
     uint64 wakeup__time = 0;
     bool detached = false;
-    std::shared_ptr<_module::SchedCoop> sched = nullptr;
+    std::shared_ptr<_module::SchedCoop> sched;
     void __ctor(DafnySequence<char> n, std::shared_ptr<_module::SchedCoop> s);
     void NoName(std::shared_ptr<_module::SchedCoop> s);
     void NoSched(DafnySequence<char> n);
